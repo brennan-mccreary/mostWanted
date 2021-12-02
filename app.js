@@ -3,6 +3,36 @@
 Build all of your functions for displaying and gathering information below (GUI).
 */
 
+//alerts user with information they requested
+function displayRequest(request) {
+  alert(request.toString().replaceAll(",",""));
+}
+
+//Assigns "info" to array to display to user
+function assignRequestInfo(person) {
+  let display = [];
+
+  display[0] = `First Name: ${person.firstName}\n`;
+  display[1] = `Last Name: ${person.lastName}\n`;
+  display[2] = `Gender: ${person.gender}\n`;
+  display[3] = `DoB: ${person.dob}\n`;
+  display[4] = `Height: ${person.height} "\n`;
+  display[5] = `Weight: ${person.weight} lbs\n`;
+  display[6] = `Eye Color: ${person.eyeColor}\n`;
+  display[7] = `Occupation: ${person.occupation}\n`;
+
+  return display;
+}
+
+//Assigns "family" to array to display to user
+function assignRequestFamily(person) {
+  
+}
+
+//Assigns "family" to array to display to user
+function assignRequestDescedants(person) {
+
+}
 // app is the function called to start the entire application
 function app(people){
   let searchType = promptFor("Do you know the name of the person you are looking for? Enter 'yes' or 'no'", yesNo).toLowerCase();
@@ -32,18 +62,22 @@ function mainMenu(person, people){
     alert("Could not find that individual.");
     return app(people); // restart
   }
-
+  
   let displayOption = prompt("Found " + person.firstName + " " + person.lastName + " . Do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'");
+  
 
   switch(displayOption){
     case "info":
-      // TODO: get person's info
+      displayRequest(assignRequestInfo(person));
+      mainMenu(person, people);
       break;
     case "family":
-      // TODO: get person's family
+      displayRequest(assignRequestFamily(person));
+      mainMenu(person, people);
       break;
     case "descendants":
-      // TODO: get person's descendants
+      displayRequest(assignRequestDescedants(person));
+      mainMenu(person, people);
       break;
     case "restart":
       app(people); // restart
@@ -68,6 +102,7 @@ function searchByName(people){
     }
   })
   // TODO: find the person using the name they entered
+  foundPerson = foundPerson[0];
   return foundPerson;
 }
 
