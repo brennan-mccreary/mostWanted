@@ -2,7 +2,14 @@
 /*
 Build all of your functions for displaying and gathering information below (GUI).
 */
-
+//format data from assignRequestFamily, pass to displayRequest
+function formatIntermediate(input) {
+  input[0] = `Descendants of ${input[0].firstName} ${input[0].lastName}\n`
+  for(let i = 1; i < input.length; i++) {
+    input[i] = `${input[i].firstName} ${input[i].lastName}\n`
+  }
+  return input;
+}
 //alerts user with information they requested
 function displayRequest(request) {
   alert(request.toString().replaceAll(",",""));
@@ -83,6 +90,7 @@ function assignRequestFamily(person, people) {
        return false;
     }
   })
+
   //format data
   family.push(`Spouse: ${spouse.firstName} ${spouse.lastName}\n`);
 
@@ -98,7 +106,25 @@ function assignRequestFamily(person, people) {
 }
 
 //Assigns "family" to array to display to user
-function assignRequestDescedants(person) {
+function assignRequestDescedants(person, people) {
+  let descendantsArr = [];
+  let descendants = [person];
+
+  for(let i = 0; i < descendants.length; i++) {
+    for(let j = 0; j < people.length; j++) {
+      for(let k = 0; k < people[j].parents.length; k++) {
+        if(descendants[i].id === people[j].parents[k]) {
+          //descendants.push(people[j]);
+          descendants.push(assignRequestDescedants(people[j], people));
+
+          descendants[descendants.length - 1] = descendants[descendants.length - 1][0];
+
+        }
+      }
+    }
+  }
+  
+  return descendants;
 
 }
 
@@ -145,7 +171,7 @@ function mainMenu(person, people){
       mainMenu(person, people);
       break;
     case "descendants":
-      displayRequest(assignRequestDescedants(person, people));
+      displayRequest(formatIntermediate(assignRequestDescedants(person, people)));
       mainMenu(person, people);
       break;
     case "restart":
