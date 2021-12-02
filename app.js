@@ -10,29 +10,98 @@ function displayRequest(request) {
 
 //Assigns "info" to array to display to user
 function assignRequestInfo(person) {
-  let display = [];
+  let info = [];
 
-  display[0] = `First Name: ${person.firstName}\n`;
-  display[1] = `Last Name: ${person.lastName}\n`;
-  display[2] = `Gender: ${person.gender}\n`;
-  display[3] = `DoB: ${person.dob}\n`;
-  display[4] = `Height: ${person.height} "\n`;
-  display[5] = `Weight: ${person.weight} lbs\n`;
-  display[6] = `Eye Color: ${person.eyeColor}\n`;
-  display[7] = `Occupation: ${person.occupation}\n`;
+  info[0] = `First Name: ${person.firstName}\n`;
+  info[1] = `Last Name: ${person.lastName}\n`;
+  info[2] = `Gender: ${person.gender}\n`;
+  info[3] = `DoB: ${person.dob}\n`;
+  info[4] = `Height: ${person.height}"\n`;
+  info[5] = `Weight: ${person.weight} lbs\n`;
+  info[6] = `Eye Color: ${person.eyeColor}\n`;
+  info[7] = `Occupation: ${person.occupation}\n`;
 
-  return display;
+  return info;
 }
 
 //Assigns "family" to array to display to user
-function assignRequestFamily(person) {
+function assignRequestFamily(person, people) {
+  let family = [];
+  let parentID = person.parents;
+  let spouseID = person.currentSpouse;
+  let personID = person.id;
+
+  let spouse = [];
+  if(spouseID !== null) {
+    spouse = people.filter(function(person) {
+      if(person.id === spouseID) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    })
+    spouse = spouse[0];
+  }
+  else {
+    spouse = {
+      firstName: "None",
+      lastName: "Found"
+    }
+  }
   
+  let siblings = people.filter(function(person) {
+    if(person.parents[0] !== undefined && person.parents[1] !== undefined) {
+      if((person.parents[0] === parentID[0] || person.parents[0] === parentID[1]) && person.id !== personID) {
+        return true;
+      }
+      else if((person.parents[0] === parentID[0] || person.parents[0] === parentID[1]) && person.id !== personID) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+    else if(person.parents[0] !== undefined) {
+      if((person.parents[0] === parentID[0] || person.parents[0] === parentID[1]) && person.id !== personID) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+    else {
+      return false;
+    }
+  })
+
+  let parents = people.filter(function(person) {
+    if(person.id === parentID[0] || person.id === parentID[1]) {
+      return true;
+    }
+    else {
+       return false;
+    }
+  })
+  //format data
+  family.push(`Spouse: ${spouse.firstName} ${spouse.lastName}\n`);
+
+  for(let i = 0; i < siblings.length; i ++) {
+    family.push(`Sibling: ${siblings[i].firstName} ${siblings[i].lastName}\n`);
+  }
+
+  for(let i = 0; i < parents.length; i ++) {
+    family.push(`Parent: ${parents[i].firstName} ${parents[i].lastName}\n`);
+  }
+
+  return family;
 }
 
 //Assigns "family" to array to display to user
 function assignRequestDescedants(person) {
 
 }
+
 // app is the function called to start the entire application
 function app(people){
   let searchType = promptFor("Do you know the name of the person you are looking for? Enter 'yes' or 'no'", yesNo).toLowerCase();
@@ -72,11 +141,11 @@ function mainMenu(person, people){
       mainMenu(person, people);
       break;
     case "family":
-      displayRequest(assignRequestFamily(person));
+      displayRequest(assignRequestFamily(person, people));
       mainMenu(person, people);
       break;
     case "descendants":
-      displayRequest(assignRequestDescedants(person));
+      displayRequest(assignRequestDescedants(person, people));
       mainMenu(person, people);
       break;
     case "restart":
