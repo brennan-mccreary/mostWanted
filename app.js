@@ -289,8 +289,14 @@ function searchByTraits(traits, people) {
 }
 
 //needed to ensure a singular person is passed to mainMenu
-function trimResults(people) { //WIP
+function trimResults(people) {
+  displayPeople(people);
+  do{
+    var response = prompt("Enter a number of the person you are looking for").trim();
+  } while(!response || isNaN(response) === true || response > people.length);
   
+  people = people[response];
+  return people;
 }
 
 function searchByName(people){
@@ -312,8 +318,10 @@ function searchByName(people){
 
 // alerts a list of people
 function displayPeople(people){
+  let num = -1;
   alert(people.map(function(person){
-    return person.firstName + " " + person.lastName;
+    num++;
+    return num + ". " + person.firstName + " " + person.lastName;
   }).join("\n"));
 }
 
