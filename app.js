@@ -107,7 +107,7 @@ function assignRequestFamily(person, people) {
 
 //Assigns "family" to array to display to user
 function assignRequestDescedants(person, people) {
-  let descendantsArr = [];
+  //let descendantsArr = [];
   let descendants = [person];
 
   for(let i = 0; i < descendants.length; i++) {
@@ -138,6 +138,7 @@ function app(people){
       break;
     case 'no':
       // TODO: search by traits
+      searchResults = gatherTraits(people);
       break;
     default:
       app(people); // restart app
@@ -182,6 +183,114 @@ function mainMenu(person, people){
     default:
       return mainMenu(person, people); // ask again
   }
+}
+
+function gatherTraits(people) {
+  let traits = [];
+  let category;
+  let description;
+  for(let i = 0; i < 5; i++) {
+    category = promptFor("Enter a trait category\nOr enter 'search', 'restart', or 'quit'", chars);
+
+    switch (category.toLowerCase()) {
+      case "restart":
+        return app(people);
+      case "quit":
+        return;
+      case "search":
+        return searchByTraits(traits, people);
+      default:
+        description = promptFor("Enter a trait description", chars);
+        traits[i] = [category.toLowerCase(), description.toString().toLowerCase()]
+    }
+  }
+  return searchByTraits(traits, people);
+}
+
+function searchByTraits(traits, people) {
+  let list = [];
+  
+  for(let i = 0; i < traits.length; i++) {
+    switch(traits[i][0]) {
+      case "gender":
+        list = people.filter(function(person) {
+          if(person.gender === traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        }) 
+        break;
+      case "dob":
+        list = people.filter(function(person) {
+          if(person.dob === traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        })
+        break;
+      case "height":
+        list = people.filter(function(person) {
+          if(person.height == traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        })
+        break;
+      case "weight":
+        list = people.filter(function(person) {
+          if(person.weight == traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        })
+        break;
+      case "eye color":
+        list = people.filter(function(person) {
+          if(person.eyeColor === traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        })
+        break;
+      case "occupation":
+        list = people.filter(function(person) {
+          if(person.occupation === traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        })
+        break;
+      default:
+        break;
+    }
+
+    people = list;
+  }
+  if(list.length > 1) {
+    list = trimResults(list);
+    return list;
+  }
+  else {
+    list = list[0];
+    return list;
+  }
+}
+
+//needed to ensure a singular person is passed to mainMenu
+function trimResults(people) { //WIP
+  
 }
 
 function searchByName(people){
