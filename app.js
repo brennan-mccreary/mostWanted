@@ -10,6 +10,7 @@ function formatIntermediate(input) {
   }
   return input;
 }
+
 //alerts user with information they requested
 function displayRequest(request) {
   alert(request.toString().replaceAll(",",""));
@@ -52,7 +53,7 @@ function assignRequestFamily(person, people) {
   }
   else {
     spouse = {
-      firstName: "None",
+      firstName: "No Spouse",
       lastName: "Found"
     }
   }
@@ -91,6 +92,20 @@ function assignRequestFamily(person, people) {
     }
   })
 
+  if(siblings.length === 0) {
+    siblings[0] = {
+      firstName: "No Siblings",
+      lastName: "Found"
+    }
+  }
+
+  if(parents.length === 0) {
+    parents[0] = {
+      firstName: "No Parents",
+      lastName: "Found"
+    }
+  }
+
   //format data
   family.push(`Spouse: ${spouse.firstName} ${spouse.lastName}\n`);
 
@@ -107,14 +122,12 @@ function assignRequestFamily(person, people) {
 
 //Assigns "family" to array to display to user
 function assignRequestDescedants(person, people) {
-  //let descendantsArr = [];
   let descendants = [person];
 
   for(let i = 0; i < descendants.length; i++) {
     for(let j = 0; j < people.length; j++) {
       for(let k = 0; k < people[j].parents.length; k++) {
         if(descendants[i].id === people[j].parents[k]) {
-          //descendants.push(people[j]);
           descendants.push(assignRequestDescedants(people[j], people));
 
           descendants[descendants.length - 1] = descendants[descendants.length - 1][0];
@@ -137,7 +150,6 @@ function app(people){
       searchResults = searchByName(people);
       break;
     case 'no':
-      // TODO: search by traits
       searchResults = gatherTraits(people);
       if(searchResults == "quit") {
         return;
@@ -188,12 +200,18 @@ function mainMenu(person, people) {
   }
 }
 
+//Gathers a list of traits from user to search by
 function gatherTraits(people) {
   let traits = [];
   let category;
   let description;
   for(let i = 0; i < 5; i++) {
-    category = promptFor("Enter a trait category\n'Gender', 'DoB', 'Height', 'Weight', 'Eye Color', 'Occupation'\nOr enter 'Search', 'Restart', or 'Quit'", traitCategory);
+    do{
+      category = promptFor("Enter a trait category\nYou will be prompted for up to 5 traits, enter 'search' to use less than 5 traits\n'Gender', 'DoB', 'Height', 'Weight', 'Eye Color', 'Occupation'\nOr enter 'Restart', or 'Quit'", traitCategory);
+      if(category === "search" && i === 0) {
+        alert("Must Enter At Least 1 Trait to Search");
+      }
+    } while(category === "search" && i === 0);
 
     switch (category.toLowerCase()) {
       case "restart":
@@ -293,11 +311,20 @@ function searchByTraits(traits, people) {
 
 //needed to ensure a singular person is passed to mainMenu
 function trimResults(people) {
-  //displayPeople(people);
+
+  var response;
   do{
-    var response = prompt(`${displayPeople(people)}\nEnter a number of the person you are looking for`).trim();
-  } while(!response || isNaN(response) === true || response >= people.length || response < 0);
+    response = prompt(`${displayPeople(people)}\nEnter a number of the person you are looking for`).trim();
+    if(response.toLowerCase() === "traits") {
+      response = -1;
+    }
+  } while(!response || response >= people.length || response < -1);
   
+  if(response === -1) {
+    people = gatherTraits(people);
+    return people;
+  }
+
   people = people[response];
   return people;
 }
@@ -314,7 +341,7 @@ function searchByName(people) {
       return false;
     }
   })
-  // TODO: find the person using the name they entered
+
   foundPerson = foundPerson[0];
   return foundPerson;
 }
@@ -333,7 +360,6 @@ function displayPerson(person) {
   // height, weight, age, name, occupation, eye color.
   let personInfo = "First Name: " + person.firstName + "\n";
   personInfo += "Last Name: " + person.lastName + "\n";
-  // TODO: finish getting the rest of the information to display
   alert(personInfo);
 }
 
@@ -342,6 +368,14 @@ function promptFor(question, valid) {
   do{
     var response = prompt(question).trim();
   } while(!response || !valid(response));
+  return response;
+}
+
+//function that prompts and validates user input against a key
+function promptForAdd(question, valid, key) {
+  do{
+    var response = prompt(question).trim();
+  } while(!response || !valid(response, key));
   return response;
 }
 
@@ -355,6 +389,7 @@ function chars(input) {
   return true; // default validation only
 }
 
+//validation function for info, family, descendants options, promptFor
 function options(input) {
   switch(input.toLowerCase()) {
     case "info": return true
@@ -366,6 +401,7 @@ function options(input) {
   }
 }
 
+//validation function for trait categories, promptFor
 function traitCategory(input) {
   switch(input.toLowerCase()) {
     case "search": return true
@@ -381,13 +417,7 @@ function traitCategory(input) {
   }
 }
 
-function promptForAdd(question, valid, key) {
-  do{
-    var response = prompt(question).trim();
-  } while(!response || !valid(response, key));
-  return response;
-}
-
+//validation function for trait descriptions based on category, promptForAdd
 function traitDescription(input, key) {
   switch(key) {
     case "height": return !isNaN(input)
