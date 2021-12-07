@@ -130,7 +130,7 @@ function assignRequestDescedants(person, people) {
 
 // app is the function called to start the entire application
 function app(people){
-  let searchType = promptFor("Do you know the name of the person you are looking for? Enter 'yes' or 'no'", yesNo).toLowerCase();
+  let searchType = promptFor("Do you know the name of the person you are looking for?\nEnter 'yes' or 'no'", yesNo).toLowerCase();
   let searchResults;
   switch(searchType){
     case 'yes':
@@ -139,6 +139,9 @@ function app(people){
     case 'no':
       // TODO: search by traits
       searchResults = gatherTraits(people);
+      if(searchResults == "quit") {
+        return;
+      }
       break;
     default:
       app(people); // restart app
@@ -150,7 +153,7 @@ function app(people){
 }
 
 // Menu function to call once you find who you are looking for
-function mainMenu(person, people){
+function mainMenu(person, people) {
 
   /* Here we pass in the entire person object that we found in our search, as well as the entire original dataset of people. We need people in order to find descendants and other information that the user may want. */
 
@@ -159,10 +162,10 @@ function mainMenu(person, people){
     return app(people); // restart
   }
   
-  let displayOption = prompt("Found " + person.firstName + " " + person.lastName + " . Do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'");
+  let displayOption = promptFor("Found " + person.firstName + " " + person.lastName + ". Do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'", options);
   
 
-  switch(displayOption){
+  switch(displayOption.toLowerCase()){
     case "info":
       displayRequest(assignRequestInfo(person));
       mainMenu(person, people);
@@ -190,17 +193,17 @@ function gatherTraits(people) {
   let category;
   let description;
   for(let i = 0; i < 5; i++) {
-    category = promptFor("Enter a trait category\nOr enter 'search', 'restart', or 'quit'", chars);
+    category = promptFor("Enter a trait category\n'Gender', 'DoB', 'Height', 'Weight', 'Eye Color', 'Occupation'\nOr enter 'Search', 'Restart', or 'Quit'", traitCategory);
 
     switch (category.toLowerCase()) {
       case "restart":
         return app(people);
       case "quit":
-        return;
+        return "quit";
       case "search":
         return searchByTraits(traits, people);
       default:
-        description = promptFor("Enter a trait description", chars);
+        description = promptForAdd(`Enter a trait description for ${category.toLowerCase()}`, traitDescription, category);
         traits[i] = [category.toLowerCase(), description.toString().toLowerCase()]
     }
   }
@@ -299,12 +302,12 @@ function trimResults(people) {
   return people;
 }
 
-function searchByName(people){
-  let firstName = promptFor("What is the person's first name?", chars);
-  let lastName = promptFor("What is the person's last name?", chars);
+function searchByName(people) {
+  let firstName = promptFor("What is the person's first name?", isNaN);
+  let lastName = promptFor("What is the person's last name?", isNaN);
 
   let foundPerson = people.filter(function(person){
-    if(person.firstName === firstName && person.lastName === lastName){
+    if(person.firstName.toLowerCase() === firstName.toLowerCase() && person.lastName.toLowerCase() === lastName.toLowerCase()){
       return true;
     }
     else{
@@ -317,7 +320,7 @@ function searchByName(people){
 }
 
 // alerts a list of people
-function displayPeople(people){
+function displayPeople(people) {
   let num = -1;
   alert(people.map(function(person){
     num++;
@@ -325,7 +328,7 @@ function displayPeople(people){
   }).join("\n"));
 }
 
-function displayPerson(person){
+function displayPerson(person) {
   // print all of the information about a person:
   // height, weight, age, name, occupation, eye color.
   let personInfo = "First Name: " + person.firstName + "\n";
@@ -335,7 +338,7 @@ function displayPerson(person){
 }
 
 // function that prompts and validates user input
-function promptFor(question, valid){
+function promptFor(question, valid) {
   do{
     var response = prompt(question).trim();
   } while(!response || !valid(response));
@@ -343,11 +346,52 @@ function promptFor(question, valid){
 }
 
 // helper function to pass into promptFor to validate yes/no answers
-function yesNo(input){
+function yesNo(input) {
   return input.toLowerCase() == "yes" || input.toLowerCase() == "no";
 }
 
 // helper function to pass in as default promptFor validation
-function chars(input){
+function chars(input) {
   return true; // default validation only
+}
+
+function options(input) {
+  switch(input.toLowerCase()) {
+    case "info": return true
+    case "family": return true
+    case "descendants": return true
+    case "restart": return true
+    case "quit": return true
+    default : return false;
+  }
+}
+
+function traitCategory(input) {
+  switch(input.toLowerCase()) {
+    case "search": return true
+    case "restart": return true
+    case "quit": return true
+    case "gender": return true
+    case "dob": return true
+    case "height": return true
+    case "weight": return true
+    case "eye color": return true
+    case "occupation": return true
+    default : return false;
+  }
+}
+
+function promptForAdd(question, valid, key) {
+  do{
+    var response = prompt(question).trim();
+  } while(!response || !valid(response, key));
+  return response;
+}
+
+function traitDescription(input, key) {
+  switch(key) {
+    case "height": return !isNaN(input)
+    case "weight": return !isNaN(input)
+    default: return isNaN(input);
+  }
 }
