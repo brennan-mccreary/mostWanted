@@ -228,6 +228,7 @@ function gatherTraits(people) {
   return searchByTraits(traits, people);
 }
 
+//Find results based on list of traits inputted by user 
 function searchByTraits(traits, people) {
   let list = [];
   
@@ -329,6 +330,7 @@ function trimResults(people) {
   return people;
 }
 
+//Find results based on a name inputted by user
 function searchByName(people) {
   let firstName = promptFor("What is the person's first name?", isNaN);
   let lastName = promptFor("What is the person's last name?", isNaN);
@@ -355,14 +357,6 @@ function displayPeople(people) {
   }).join("\n");
 }
 
-function displayPerson(person) {
-  // print all of the information about a person:
-  // height, weight, age, name, occupation, eye color.
-  let personInfo = "First Name: " + person.firstName + "\n";
-  personInfo += "Last Name: " + person.lastName + "\n";
-  alert(personInfo);
-}
-
 // function that prompts and validates user input
 function promptFor(question, valid) {
   do{
@@ -382,11 +376,6 @@ function promptForAdd(question, valid, key) {
 // helper function to pass into promptFor to validate yes/no answers
 function yesNo(input) {
   return input.toLowerCase() == "yes" || input.toLowerCase() == "no";
-}
-
-// helper function to pass in as default promptFor validation
-function chars(input) {
-  return true; // default validation only
 }
 
 //validation function for info, family, descendants options, promptFor
