@@ -1,7 +1,153 @@
 "use strict"
-/*
-Build all of your functions for displaying and gathering information below (GUI).
-*/
+/*Gather and Display functions*/
+//Gathers a list of traits from user to search by
+function gatherTraits(people) {
+  let traits = [];
+  let category;
+  let description;
+  for(let i = 0; i < 5; i++) {
+    do{
+      category = promptFor("Enter a trait category\nYou will be prompted for up to 5 traits, enter 'search' to use less than 5 traits\n'Gender', 'DoB', 'Height', 'Weight', 'Eye Color', 'Occupation'\nOr enter 'Restart', or 'Quit'", traitCategory);
+      if(category === "search" && i === 0) {
+        alert("Must Enter At Least 1 Trait to Search");
+      }
+    } while(category === "search" && i === 0);
+
+    switch (category.toLowerCase()) {
+      case "restart":
+        return app(people);
+      case "quit":
+        return "quit";
+      case "search":
+        return searchByTraits(traits, people);
+      default:
+        description = promptForAdd(`Enter a trait description for ${category.toLowerCase()}`, traitDescription, category);
+        traits[i] = [category.toLowerCase(), description.toString().toLowerCase()]
+    }
+  }
+  return searchByTraits(traits, people);
+}
+
+//Find results based on list of traits inputted by user 
+function searchByTraits(traits, people) {
+  let list = [];
+  
+  for(let i = 0; i < traits.length; i++) {
+    switch(traits[i][0]) {
+      case "gender":
+        list = people.filter(function(person) {
+          if(person.gender === traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        }) 
+        break;
+      case "dob":
+        list = people.filter(function(person) {
+          if(person.dob === traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        })
+        break;
+      case "height":
+        list = people.filter(function(person) {
+          if(person.height == traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        })
+        break;
+      case "weight":
+        list = people.filter(function(person) {
+          if(person.weight == traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        })
+        break;
+      case "eye color":
+        list = people.filter(function(person) {
+          if(person.eyeColor === traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        })
+        break;
+      case "occupation":
+        list = people.filter(function(person) {
+          if(person.occupation === traits[i][1]){
+            return true;
+          }
+          else{
+            return false;
+          }
+        })
+        break;
+      default:
+        break;
+    }
+
+    people = list;
+  }
+  if(list.length > 1) {
+    list = trimResults(list);
+    return list;
+  }
+  else {
+    list = list[0];
+    return list;
+  }
+}
+
+//Find results based on a name inputted by user
+function searchByName(people) {
+  let firstName = promptFor("What is the person's first name?", isNaN);
+  let lastName = promptFor("What is the person's last name?", isNaN);
+
+  let foundPerson = people.filter(function(person){
+    if(person.firstName.toLowerCase() === firstName.toLowerCase() && person.lastName.toLowerCase() === lastName.toLowerCase()){
+      return true;
+    }
+    else{
+      return false;
+    }
+  })
+
+  foundPerson = foundPerson[0];
+  return foundPerson;
+}
+
+//needed to ensure a singular person is passed to mainMenu
+function trimResults(people) {
+
+  var response;
+  do{
+    response = prompt(`${displayPeople(people)}\nEnter a number of the person you are looking for\nEnter 'Traits' to narrow your search with another trait`).trim();
+    if(response.toLowerCase() === "traits") {
+      response = -1;
+    }
+  } while(!response || response >= people.length || response < -1);
+  
+  if(response === -1) {
+    people = gatherTraits(people);
+    return people;
+  }
+
+  people = people[response];
+  return people;
+}
+
 //format data from assignRequestFamily, pass to displayRequest
 function formatIntermediate(input) {
   input[0] = `Descendants of ${input[0].firstName} ${input[0].lastName}\n`
@@ -14,6 +160,15 @@ function formatIntermediate(input) {
 //alerts user with information they requested
 function displayRequest(request) {
   alert(request.toString().replaceAll(",",""));
+}
+
+// alerts a list of people
+function displayPeople(people) {
+  let num = -1;
+  return people.map(function(person){
+    num++;
+    return num + ". " + person.firstName + " " + person.lastName;
+  }).join("\n");
 }
 
 //Assigns "info" to array to display to user
@@ -141,6 +296,8 @@ function assignRequestDescedants(person, people) {
 
 }
 
+
+/*App and main menu*/
 // app is the function called to start the entire application
 function app(people){
   let searchType = promptFor("Do you know the name of the person you are looking for?\nEnter 'yes' or 'no'", yesNo).toLowerCase();
@@ -200,163 +357,8 @@ function mainMenu(person, people) {
   }
 }
 
-//Gathers a list of traits from user to search by
-function gatherTraits(people) {
-  let traits = [];
-  let category;
-  let description;
-  for(let i = 0; i < 5; i++) {
-    do{
-      category = promptFor("Enter a trait category\nYou will be prompted for up to 5 traits, enter 'search' to use less than 5 traits\n'Gender', 'DoB', 'Height', 'Weight', 'Eye Color', 'Occupation'\nOr enter 'Restart', or 'Quit'", traitCategory);
-      if(category === "search" && i === 0) {
-        alert("Must Enter At Least 1 Trait to Search");
-      }
-    } while(category === "search" && i === 0);
 
-    switch (category.toLowerCase()) {
-      case "restart":
-        return app(people);
-      case "quit":
-        return "quit";
-      case "search":
-        return searchByTraits(traits, people);
-      default:
-        description = promptForAdd(`Enter a trait description for ${category.toLowerCase()}`, traitDescription, category);
-        traits[i] = [category.toLowerCase(), description.toString().toLowerCase()]
-    }
-  }
-  return searchByTraits(traits, people);
-}
-
-//Find results based on list of traits inputted by user 
-function searchByTraits(traits, people) {
-  let list = [];
-  
-  for(let i = 0; i < traits.length; i++) {
-    switch(traits[i][0]) {
-      case "gender":
-        list = people.filter(function(person) {
-          if(person.gender === traits[i][1]){
-            return true;
-          }
-          else{
-            return false;
-          }
-        }) 
-        break;
-      case "dob":
-        list = people.filter(function(person) {
-          if(person.dob === traits[i][1]){
-            return true;
-          }
-          else{
-            return false;
-          }
-        })
-        break;
-      case "height":
-        list = people.filter(function(person) {
-          if(person.height == traits[i][1]){
-            return true;
-          }
-          else{
-            return false;
-          }
-        })
-        break;
-      case "weight":
-        list = people.filter(function(person) {
-          if(person.weight == traits[i][1]){
-            return true;
-          }
-          else{
-            return false;
-          }
-        })
-        break;
-      case "eye color":
-        list = people.filter(function(person) {
-          if(person.eyeColor === traits[i][1]){
-            return true;
-          }
-          else{
-            return false;
-          }
-        })
-        break;
-      case "occupation":
-        list = people.filter(function(person) {
-          if(person.occupation === traits[i][1]){
-            return true;
-          }
-          else{
-            return false;
-          }
-        })
-        break;
-      default:
-        break;
-    }
-
-    people = list;
-  }
-  if(list.length > 1) {
-    list = trimResults(list);
-    return list;
-  }
-  else {
-    list = list[0];
-    return list;
-  }
-}
-
-//needed to ensure a singular person is passed to mainMenu
-function trimResults(people) {
-
-  var response;
-  do{
-    response = prompt(`${displayPeople(people)}\nEnter a number of the person you are looking for`).trim();
-    if(response.toLowerCase() === "traits") {
-      response = -1;
-    }
-  } while(!response || response >= people.length || response < -1);
-  
-  if(response === -1) {
-    people = gatherTraits(people);
-    return people;
-  }
-
-  people = people[response];
-  return people;
-}
-
-//Find results based on a name inputted by user
-function searchByName(people) {
-  let firstName = promptFor("What is the person's first name?", isNaN);
-  let lastName = promptFor("What is the person's last name?", isNaN);
-
-  let foundPerson = people.filter(function(person){
-    if(person.firstName.toLowerCase() === firstName.toLowerCase() && person.lastName.toLowerCase() === lastName.toLowerCase()){
-      return true;
-    }
-    else{
-      return false;
-    }
-  })
-
-  foundPerson = foundPerson[0];
-  return foundPerson;
-}
-
-// alerts a list of people
-function displayPeople(people) {
-  let num = -1;
-  return people.map(function(person){
-    num++;
-    return num + ". " + person.firstName + " " + person.lastName;
-  }).join("\n");
-}
-
+/*Validation measure*/
 // function that prompts and validates user input
 function promptFor(question, valid) {
   do{
